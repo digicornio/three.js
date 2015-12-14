@@ -1,17 +1,19 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 Sidebar.Geometry.CircleGeometry = function ( signals, object ) {
 
 	var container = new UI.Panel();
-	container.setBorderTop( '1px solid #ccc' );
-	container.setPaddingTop( '10px' );
 
-	var geometry = object.geometry;
+	var parameters = object.geometry.parameters;
 
 	// radius
 
 	var radiusRow = new UI.Panel();
-	var radius = new UI.Number( geometry.radius ).onChange( update );
+	var radius = new UI.Number( parameters.radius ).onChange( update );
 
-	radiusRow.add( new UI.Text( 'Radius' ).setWidth( '90px' ).setColor( '#666' ) );
+	radiusRow.add( new UI.Text( 'Radius' ).setWidth( '90px' ) );
 	radiusRow.add( radius );
 
 	container.add( radiusRow );
@@ -19,29 +21,47 @@ Sidebar.Geometry.CircleGeometry = function ( signals, object ) {
 	// segments
 
 	var segmentsRow = new UI.Panel();
-	var segments = new UI.Integer( geometry.segments ).onChange( update );
+	var segments = new UI.Integer( parameters.segments ).setRange( 3, Infinity ).onChange( update );
 
-	segmentsRow.add( new UI.Text( 'Segments' ).setWidth( '90px' ).setColor( '#666' ) );
+	segmentsRow.add( new UI.Text( 'Segments' ).setWidth( '90px' ) );
 	segmentsRow.add( segments );
 
 	container.add( segmentsRow );
+
+	// thetaStart
+
+	var thetaStartRow = new UI.Panel();
+	var thetaStart = new UI.Number( parameters.thetaStart ).onChange( update );
+
+	thetaStartRow.add( new UI.Text( 'Theta start' ).setWidth( '90px' ) );
+	thetaStartRow.add( thetaStart );
+
+	container.add( thetaStartRow );
+
+	// thetaLength
+
+	var thetaLengthRow = new UI.Panel();
+	var thetaLength = new UI.Number( parameters.thetaLength ).onChange( update );
+
+	thetaLengthRow.add( new UI.Text( 'Theta length' ).setWidth( '90px' ) );
+	thetaLengthRow.add( thetaLength );
+
+	container.add( thetaLengthRow );
 
 	//
 
 	function update() {
 
-		delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
-
 		object.geometry.dispose();
 
 		object.geometry = new THREE.CircleGeometry(
 			radius.getValue(),
-			segments.getValue()
+			segments.getValue(),
+			thetaStart.getValue(),
+			thetaLength.getValue()
 		);
 
-		object.geometry.computeBoundingSphere();
-
-		signals.objectChanged.dispatch( object );
+		signals.geometryChanged.dispatch( object );
 
 	}
 
